@@ -1,0 +1,32 @@
+{
+  "name": "Flutter Development Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.flutter",
+        "Dart-Code.dart"
+      ]
+    }
+  },
+  // Remove de forma limpa qualquer container antigo baseado na label do projeto
+  "initializeCommand": "docker rm -f $(docker ps -a -q --filter label=devcontainer.local_folder=${localWorkspaceFolder}) 2>/dev/null || true",
+  
+  "runArgs": [
+    "--name", "${localWorkspaceFolderBasename}-devcontainer",
+    "--network=flutterdev_platform_network",
+    // CRUCIAL: Diz ao Docker para ler o arquivo .env real da raiz
+    "--env-file", ".env",
+    // Como o Flutter Web roda dentro do container, expomos um range de portas seguro
+    // ou uma porta padrão de desenvolvimento que o container vai escutar internamente
+    "-p", "8085:8085"
+  ],
+  "devPortManager": "local",
+  "remoteUser": "developer",
+
+  // O script agora lê a variável FLUTTER_APP_NAME diretamente de DENTRO do container,
+  // porque o `--env-file` injetou ela perfeitamente no Linux do container!
+  "postCreateCommand": "if [ ! -d \"$FLUTTER_APP_NAME\" ]; then flutter create $FLUTTER_APP_NAME --platforms=web && cd $FLUTTER_APP_NAME && flutter pub add dio && cat << 'EOF' > lib/main.dart\nimport 'package:flutter/material.dart';\nimport 'package:dio/dio.dart';\n\nvoid main() {\n  runApp(const MyApp());\n}\n\nclass MyApp extends StatelessWidget {\n  const MyApp({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      home: Scaffold(\n        appBar: AppBar(title: const Text('Facul App - Flutter & Docker')),\n        body: const ApiTestWidget(),\n      ),\n    );\n  }\n}\n\nclass ApiTestWidget extends StatefulWidget {\n  const ApiTestWidget({super.key});\n\n  @override\n  State<ApiTestWidget> createState() => _ApiTestWidgetState();\n}\n\nclass _ApiTestWidgetState extends State<ApiTestWidget> {\n  String _response = 'Carregando dados da API PHP...';\n\n  @override\n  void initState() {\n    super.initState();\n    _fetchData();\n  }\n\n  Future<void> _fetchData() async {\n    final dio = Dio();\n    try {\n      final response = await dio.get('http://localhost:8000');\n      setState(() {\n        _response = response.data['mensagem'] ?? 'Chave não encontrada';\n      });\n    } catch (e) {\n      setState(() {\n        _response = 'Erro ao conectar na API: \\$e';\n      });\n    }\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    return Center(\n      child: Padding(\n        padding: const EdgeInsets.all(20.0),\n        child: Text(\n          _response,\n          style: const TextStyle(fontSize: 18),\n          textAlign: TextAlign.center,\n        ),\n      ),\n    );\n  }\n}\nEOF\nelse cd $FLUTTER_APP_NAME; fi && flutter pub get"
+}

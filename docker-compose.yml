@@ -1,0 +1,51 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: php_api
+    restart: always
+    ports:
+      - "${API_PORT:-8000}:80" # Redireciona a externa (8000) para a padrão do Apache (80)
+    volumes:
+      - ./api/src:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - app-network
+
+  db:
+    image: mariadb:10.6
+    container_name: mariadb_db
+    restart: always
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    container_name: adminer_panel
+    restart: always
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    name: flutterdev_platform_network
+    driver: bridge
