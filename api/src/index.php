@@ -22,10 +22,15 @@ $resultado = match ($resource) {
         require_once './controllers/FornecedorController.php',
         require_once './routes/FornecedorRoutes.php',
     ],
+    'funcionarios' => [
+        require_once './models/FuncionarioModel.php',
+        require_once './controllers/FuncionarioController.php',
+        require_once './routes/FuncionarioRoutes.php',
+    ],
     'produtos' => [
         require_once './models/ProdutoModel.php',
         require_once './controllers/ProdutoController.php',
-        require_once './routes/ProdutoRoute.php',
+        require_once './routes/ProdutoRoutes.php',
     ],
     default => [
         http_response_code(404),
