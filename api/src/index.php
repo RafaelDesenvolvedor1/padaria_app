@@ -12,6 +12,7 @@ $id = $uriSegments[1] ?? null;
 
 // O match agora apenas RETORNA os dados, sem dar echo direto
 $resultado = match ($resource) {
+    '' => json_stream(["mensagem" => "Bem-vindo à API do app padaria."]),
     'clientes' => [ 
         require_once './models/ClienteModel.php',
         require_once './controllers/ClienteController.php',
