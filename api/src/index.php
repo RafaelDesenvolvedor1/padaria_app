@@ -32,6 +32,11 @@ $resultado = match ($resource) {
         require_once './controllers/ProdutoController.php',
         require_once './routes/ProdutoRoutes.php',
     ],
+    'vendas' => [
+        require_once './models/VendaModel.php',
+        require_once './controllers/VendaController.php',
+        require_once './routes/VendaRoutes.php',
+    ],
     default => [
         http_response_code(404),
         json_stream(["error" => "Recurso não encontrado"]) 
