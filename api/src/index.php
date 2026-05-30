@@ -22,7 +22,11 @@ $resultado = match ($resource) {
         require_once './controllers/FornecedorController.php',
         require_once './routes/FornecedorRoutes.php',
     ],
-    'produtos' => json_stream(["message" => "Rota de produtos ainda não implementada"]),
+    'produtos' => [
+        require_once './models/ProdutoModel.php',
+        require_once './controllers/ProdutoController.php',
+        require_once './routes/ProdutoRoute.php',
+    ],
     default => [
         http_response_code(404),
         json_stream(["error" => "Recurso não encontrado"]) 
