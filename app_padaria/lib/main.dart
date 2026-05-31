@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+import './screens/MainScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,55 +11,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Facul App - Flutter & Docker')),
-        body: const ApiTestWidget(),
-      ),
-    );
-  }
-}
-
-class ApiTestWidget extends StatefulWidget {
-  const ApiTestWidget({super.key});
-
-  @override
-  State<ApiTestWidget> createState() => _ApiTestWidgetState();
-}
-
-class _ApiTestWidgetState extends State<ApiTestWidget> {
-  String _response = 'Carregando dados da API PHP...';
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final dio = Dio();
-    try {
-      final response = await dio.get('http://localhost:8000');
-      setState(() {
-        _response = response.data['mensagem'] ?? 'Chave não encontrada';
-      });
-    } catch (e) {
-      setState(() {
-        _response = 'Erro ao conectar na API: \$e';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Text(
-          _response,
-          style: const TextStyle(fontSize: 18),
-          textAlign: TextAlign.center,
+      title: 'Padaria App',
+      debugShowCheckedModeBanner: false,
+      
+      // Configuração do Tema Escuro baseado no protótipo
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF121212), // Fundo do app
+        primaryColor: const Color(0xFFFF9800), // Laranja de destaque
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFFF9800),
+          surface: Color(0xFF1E1E1E), // Cor dos cards
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E1E1E),
+          elevation: 0,
         ),
       ),
+      
+      // Define a tela com a Navbar como a inicial
+      home: const MainScreen(),
     );
   }
 }
